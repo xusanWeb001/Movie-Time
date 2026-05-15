@@ -4,9 +4,18 @@ const genreSelect = document.getElementById("genreSelect");
 const countText = document.getElementById("countText");
 const emptyMsg = document.getElementById("emptyMsg");
 
-// Skeleton loader
-function showSkeletons(n = 8) {
-  for (let i = 0; i < n; i++) {
+// Genre dropdown
+const allGenres = [...new Set(films.flatMap(f => f.genres))].sort();
+allGenres.forEach(g => {
+  const opt = document.createElement("option");
+  opt.value = g;
+  opt.textContent = g;
+  genreSelect.appendChild(opt);
+});
+
+// Skeleton
+function showSkeletons() {
+  for (let i = 0; i < 8; i++) {
     const li = document.createElement("li");
     li.className = "movie-item skeleton-item";
     li.innerHTML = `
@@ -25,18 +34,31 @@ function removeSkeletons() {
   document.querySelectorAll(".skeleton-item").forEach(el => el.remove());
 }
 
-// Genre dropdown
-const allGenres = [...new Set(films.flatMap(f => f.genres))].sort();
-allGenres.forEach(g => {
-  const opt = document.createElement("option");
-  opt.value = g;
-  opt.textContent = g;
-  genreSelect.appendChild(opt);
-});
+// Filter
+function filter() {
+  const q = searchInput.value.toLowerCase().trim();
+  const g = genreSelect.value.toLowerCase();
+  const items = elList.querySelectorAll(".movie-item:not(.skeleton-item)");
+  let count = 0;
 
-// Render cards
+  items.forEach(item => {
+    const matchTitle = item.dataset.title.includes(q);
+    const matchGenre = !g || item.dataset.genres.includes(g);
+    if (matchTitle && matchGenre) {
+      item.classList.remove("hidden");
+      count++;
+    } else {
+      item.classList.add("hidden");
+    }
+  });
+
+  countText.innerHTML = `<span>${count}</span> movie${count !== 1 ? "s" : ""} found`;
+  emptyMsg.style.display = count === 0 ? "block" : "none";
+}
+
+// Render
 function renderFilms() {
-  showSkeletons(8);
+  showSkeletons();
 
   setTimeout(() => {
     removeSkeletons();
@@ -90,33 +112,14 @@ function renderFilms() {
       elList.appendChild(elItem);
     });
 
+    // filter faqat render tugagandan keyin chaqiriladi
     filter();
-  }, 600);
-}
 
-// Filter
-function filter() {
-  const q = searchInput.value.toLowerCase().trim();
-  const g = genreSelect.value.toLowerCase();
-  const items = elList.querySelectorAll(".movie-item:not(.skeleton-item)");
-  let count = 0;
-
-  items.forEach(item => {
-    const match = item.dataset.title.includes(q) &&
-      (!g || item.dataset.genres.includes(g));
-    if (match) {
-      item.classList.remove("hidden");
-      count++;
-    } else {
-      item.classList.add("hidden");
-    }
-  });
-
-  countText.innerHTML = `<span>${count}</span> movie${count !== 1 ? "s" : ""} found`;
-  emptyMsg.style.display = count === 0 ? "block" : "none";
+  }, 500);
 }
 
 searchInput.addEventListener("input", filter);
 genreSelect.addEventListener("change", filter);
 
+// Ishga tushirish
 renderFilms();
