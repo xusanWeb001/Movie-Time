@@ -1,21 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Movie.com</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="./main.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+  <title>Movie.com</title>
 </head>
+
 <body>
 
   <div class="container">
-    <h1 class="title"><img src="./movie img.png" alt=""></h1>
-
-    <ul class="movies-list js-list"></ul>
+    <h1 class="title"><img src="./Movie img.png" alt=""></h1>
+    <div class="controls">
+      <div class="search-wrap">
+        <i class="ti ti-search"></i>
+        <input class="search-input" type="text" id="searchInput" placeholder="Search movies..." />
+      </div>
+      <select class="genre-select" id="genreSelect">
+        <option value="">All Genres</option>
+      </select>
+    </div>
+    <div class="count" id="countText"></div>
+    <ul class="movies-list js-list" id="movieList"></ul>
+    <div class="empty" id="emptyMsg">No movies found</div>
   </div>
-
   <script src="./film.js"></script>
   <script src="./main.js"></script>
 </body>
+
 </html>
