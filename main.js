@@ -4,7 +4,28 @@ const genreSelect = document.getElementById("genreSelect");
 const countText = document.getElementById("countText");
 const emptyMsg = document.getElementById("emptyMsg");
 
-// Build genre dropdown
+// Skeleton loader
+function showSkeletons(n = 8) {
+  for (let i = 0; i < n; i++) {
+    const li = document.createElement("li");
+    li.className = "movie-item skeleton-item";
+    li.innerHTML = `
+            <div class="skeleton skeleton-img"></div>
+            <div class="movie-content">
+                <div class="skeleton skeleton-title"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text short"></div>
+                <div class="skeleton skeleton-badge"></div>
+            </div>`;
+    elList.appendChild(li);
+  }
+}
+
+function removeSkeletons() {
+  document.querySelectorAll(".skeleton-item").forEach(el => el.remove());
+}
+
+// Genre dropdown
 const allGenres = [...new Set(films.flatMap(f => f.genres))].sort();
 allGenres.forEach(g => {
   const opt = document.createElement("option");
@@ -13,61 +34,71 @@ allGenres.forEach(g => {
   genreSelect.appendChild(opt);
 });
 
-// Render all cards
-films.forEach((film, i) => {
-  const elItem = document.createElement("li");
-  const elImg = document.createElement("img");
-  const elContent = document.createElement("div");
-  const elTitle = document.createElement("h2");
-  const elText = document.createElement("p");
-  const elGenres = document.createElement("div");
-  const elDate = document.createElement("span");
+// Render cards
+function renderFilms() {
+  showSkeletons(8);
 
-  elItem.className = "movie-item";
-  elImg.className = "movie-img";
-  elContent.className = "movie-content";
-  elTitle.className = "movie-title";
-  elText.className = "movie-text";
-  elGenres.className = "genres";
-  elDate.className = "date";
+  setTimeout(() => {
+    removeSkeletons();
 
-  elItem.dataset.title = film.title.toLowerCase();
-  elItem.dataset.genres = film.genres.join(",").toLowerCase();
-  elItem.style.animationDelay = `${i * 0.05}s`;
+    films.forEach((film, i) => {
+      const elItem = document.createElement("li");
+      const elImg = document.createElement("img");
+      const elContent = document.createElement("div");
+      const elTitle = document.createElement("h2");
+      const elText = document.createElement("p");
+      const elGenres = document.createElement("div");
+      const elDate = document.createElement("span");
 
-  elImg.src = film.poster;
-  elImg.alt = film.title;
-  elImg.loading = "lazy";
+      elItem.className = "movie-item";
+      elImg.className = "movie-img";
+      elContent.className = "movie-content";
+      elTitle.className = "movie-title";
+      elText.className = "movie-text";
+      elGenres.className = "genres";
+      elDate.className = "date";
 
-  elTitle.textContent = film.title;
-  elText.textContent = film.overview;
+      elItem.dataset.title = film.title.toLowerCase();
+      elItem.dataset.genres = film.genres.join(",").toLowerCase();
+      elItem.style.animationDelay = `${i * 0.04}s`;
 
-  film.genres.forEach(g => {
-    const span = document.createElement("span");
-    span.className = "genre";
-    span.textContent = g;
-    elGenres.appendChild(span);
-  });
+      elImg.src = film.poster;
+      elImg.alt = film.title;
+      elImg.loading = "lazy";
 
-  const dateObj = new Date(film.release_date * 1000);
-  elDate.textContent = dateObj.toLocaleDateString("en-US", {
-    year: "numeric", month: "short", day: "numeric"
-  });
+      elTitle.textContent = film.title;
+      elText.textContent = film.overview;
 
-  elContent.appendChild(elTitle);
-  elContent.appendChild(elText);
-  elContent.appendChild(elGenres);
-  elContent.appendChild(elDate);
-  elItem.appendChild(elImg);
-  elItem.appendChild(elContent);
-  elList.appendChild(elItem);
-});
+      film.genres.forEach(g => {
+        const span = document.createElement("span");
+        span.className = "genre";
+        span.textContent = g;
+        elGenres.appendChild(span);
+      });
 
-// Filter function
+      const d = new Date(film.release_date * 1000);
+      elDate.textContent = d.toLocaleDateString("en-US", {
+        year: "numeric", month: "short", day: "numeric"
+      });
+
+      elContent.appendChild(elTitle);
+      elContent.appendChild(elText);
+      elContent.appendChild(elGenres);
+      elContent.appendChild(elDate);
+      elItem.appendChild(elImg);
+      elItem.appendChild(elContent);
+      elList.appendChild(elItem);
+    });
+
+    filter();
+  }, 600);
+}
+
+// Filter
 function filter() {
   const q = searchInput.value.toLowerCase().trim();
   const g = genreSelect.value.toLowerCase();
-  const items = elList.querySelectorAll(".movie-item");
+  const items = elList.querySelectorAll(".movie-item:not(.skeleton-item)");
   let count = 0;
 
   items.forEach(item => {
@@ -87,4 +118,5 @@ function filter() {
 
 searchInput.addEventListener("input", filter);
 genreSelect.addEventListener("change", filter);
-filter();
+
+renderFilms();
